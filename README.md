@@ -1,2 +1,5 @@
-# dll24
-DLL24 - Generative Models
+# Deep Learning Lab 2024 - Generative Models 
+## Members:
+- Ekaterina Shiryaeva
+- Iman Ghashghaeizadeh
+- Nikita Popkov
