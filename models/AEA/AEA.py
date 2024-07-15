@@ -36,30 +36,30 @@ class AEA(pl.LightningModule):
         self.lr = lr
         if less_param:
             self.encoder = nn.Sequential(
-                nn.Conv1d(num_fet, 32, 3, stride=2, padding=1),
+                nn.Conv1d(num_fet, 32, 3, stride=1, padding=0),
                 SelfAttention(32),
                 nn.LeakyReLU(),
-                nn.Conv1d(32, 64, 3, stride=2, padding=1),
+                nn.Conv1d(32, 64, 3, stride=1, padding=0),
                 SelfAttention(64),
                 nn.LeakyReLU(),
-                nn.Conv1d(64, 128, 3, stride=2, padding=1),
+                nn.Conv1d(64, 128, 3, stride=1, padding=0),
                 nn.LeakyReLU(),
             )
 
             self.attention = SelfAttention(128)
 
             self.decoder = nn.Sequential(
-                nn.ConvTranspose1d(128, 64, 3, stride=2, padding=1),
+                nn.ConvTranspose1d(128, 64, 3, stride=1, padding=0),
                 SelfAttention(64),
                 nn.LeakyReLU(),
-                nn.ConvTranspose1d(64, 32, 3, stride=2, padding=1),
+                nn.ConvTranspose1d(64, 32, 3, stride=1, padding=0),
                 SelfAttention(32),
                 nn.LeakyReLU(),
-                nn.ConvTranspose1d(32, 1, 3, stride=2, padding=1),
+                nn.ConvTranspose1d(32, 1, 3, stride=1, padding=0),
                 nn.Sigmoid(),
             )
             
-            self.fitter = nn.Linear(153,120)
+            #self.fitter = nn.Linear(153,120)
         else:
             self.encoder = nn.Sequential(
                 nn.Conv1d(num_fet, 32, 3, stride=1, padding=0),
@@ -93,7 +93,7 @@ class AEA(pl.LightningModule):
             
             #self.fitter = nn.Linear(24993,160000)
 
-            self.net = nn.Sequential(self.encoder,self.attention,self.decoder)
+        self.net = nn.Sequential(self.encoder,self.attention,self.decoder)
 
     def saveModel(self, model, path):
         """Saves state of an model for future loading
