@@ -12,3 +12,4 @@ __pycache__/
 *.hdf
 *.csv
 lightning_logs
+*.wav
