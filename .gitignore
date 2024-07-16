@@ -13,3 +13,6 @@ __pycache__/
 *.csv
 lightning_logs
 *.wav
+
+.idea
+notebooks/reproduce_training_ekaterina/noise_data/*
