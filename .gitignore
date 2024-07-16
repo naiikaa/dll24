@@ -16,3 +16,4 @@ lightning_logs
 
 .idea
 notebooks/reproduce_training_ekaterina/noise_data/*
+data_birdset
