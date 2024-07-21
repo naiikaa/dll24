@@ -1,5 +1,5 @@
 from omegaconf import OmegaConf
-
+# can be used for reducing number of config files in the future for personal usage
 files = [
     "./configs_birdset/datamodule/HSN.yaml",
     "./configs_birdset/module/multilabel.yaml",

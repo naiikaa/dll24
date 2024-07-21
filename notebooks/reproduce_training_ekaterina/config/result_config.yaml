@@ -1,0 +1,246 @@
+task_name: train
+ckpt_path: null
+seed: 1
+module:
+  network:
+    model:
+      _target_: birdset.modules.models.ast.ASTSequenceClassifier
+      checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
+      local_checkpoint: null
+      num_classes: null
+      cache_dir: ${paths.model_path}
+      pretrain_info:
+        hf_path: ${datamodule.dataset.hf_path}
+        hf_name: ${datamodule.dataset.hf_name}
+        hf_pretrain_name: null
+        valid_test_only: false
+    model_name: ast
+    model_type: vision
+    torch_compile: false
+    sampling_rate: 32000
+    normalize_spectrogram: true
+    normalize_waveform: instance_normalization
+  _target_: birdset_modules.multilabel_module.MultilabelModule
+  task: multilabel
+  prediction_table: false
+  num_gpus: ${trainer.devices}
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 1.0e-05
+    weight_decay: 0.01
+  metrics:
+    _target_: configs_local.module_configs.MultilabelMetricsConfig
+    num_labels: ${datamodule.dataset.n_classes}
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  output_activation:
+    _target_: torch.sigmoid
+    _partial_: true
+  logging_params:
+    _target_: birdset.modules.base_module.LoggingParamsConfig
+    on_step: false
+    on_epoch: true
+    sync_dist: false
+    prog_bar: true
+logger:
+  wandb:
+    mode: online
+    _target_: pytorch_lightning.loggers.wandb.WandbLogger
+    name: ${module.network.model_name}_${datamodule.dataset.dataset_name}#${seed}_${start_time}
+    save_dir: ${paths.log_dir}
+    offline: true
+    id: null
+    anonymous: null
+    project: test
+    log_model: false
+    group: ''
+    tags: []
+    job_type: ''
+train: true
+test: true
+save_state_dict: true
+start_time: ${now:%Y-%m-%d_%H%M%S}
+dump_metrics: true
+datamodule:
+  _target_: datamodule.birdset_datamodule.BirdSetDataModule
+  dataset:
+    data_dir: ${paths.dataset_path}
+    dataset_name: HSN
+    hf_path: DBD-research-group/BirdSet
+    hf_name: HSN
+    seed: ${seed}
+    n_workers: 5
+    val_split: 0.2
+    task: ${module.task}
+    subset: null
+    sampling_rate: ${module.network.sampling_rate}
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 500
+    eventlimit: 5
+  transforms:
+    _target_: datamodule.components.transforms.BirdSetTransformsWrapper
+    sampling_rate: ${module.network.sampling_rate}
+    model_type: ${module.network.model_type}
+    task: ${datamodule.dataset.task}
+    max_length: 5
+    preprocessing:
+      melscale_conversion:
+        _target_: torchaudio.transforms.MelScale
+        n_mels: 128
+        sample_rate: ${module.network.sampling_rate}
+        n_stft: 513
+      dbscale_conversion:
+        _target_: datamodule.components.augmentations.PowerToDB
+      resizer:
+        _target_: datamodule.components.resize.Resizer
+        db_scale: true
+        target_height: null
+        target_width: null
+      normalize_waveform: ${module.network.normalize_waveform}
+      normalize_spectrogram: ${module.network.normalize_spectrogram}
+      mean: -4.268
+      std: 4.569
+    waveform_augmentations:
+      multilabel_mix:
+        _target_: datamodule.components.augmentations.MultilabelMix
+        p: 0.7
+        min_snr_in_db: 3.0
+        max_snr_in_db: 30.0
+        mix_target: union
+      background_noise:
+        _target_: datamodule.components.augmentations.AddBackgroundNoise
+        p: 0.5
+        min_snr_in_db: 3
+        max_snr_in_db: 30
+        sample_rate: ${module.network.sampling_rate}
+        target_rate: ${module.network.sampling_rate}
+        background_paths: ${paths.background_path}
+      colored_noise:
+        _target_: torch_audiomentations.AddColoredNoise
+        p: 0.2
+        max_f_decay: 2
+        min_f_decay: -2
+        max_snr_in_db: 30
+        min_snr_in_db: 3
+      gain:
+        _target_: torch_audiomentations.Gain
+        p: 0.2
+        min_gain_in_db: -18
+        max_gain_in_db: 6
+    spectrogram_augmentations:
+      frequency_masking:
+        _target_: torchvision.transforms.RandomApply
+        p: 0.5
+        transforms:
+        - _target_: torchaudio.transforms.FrequencyMasking
+          freq_mask_param: 100
+          iid_masks: true
+      time_masking:
+        _target_: torchvision.transforms.RandomApply
+        p: 0.3
+        transforms:
+        - _target_: torchaudio.transforms.TimeMasking
+          time_mask_param: 100
+          iid_masks: true
+    decoding:
+      _target_: datamodule.components.EventDecoding
+      min_len: 1.0
+      max_len: 5.0
+      sampling_rate: ${module.network.sampling_rate}
+      extension_time: 8
+      extracted_interval: 5
+    feature_extractor:
+      _target_: datamodule.components.DefaultFeatureExtractor
+      feature_size: 1
+      sampling_rate: ${module.network.sampling_rate}
+      padding_value: 0.0
+      return_attention_mask: false
+  loaders:
+    _target_: datamodule.LoadersConfig
+    train:
+      _target_: datamodule.LoaderConfig
+      batch_size: 8
+      shuffle: true
+      num_workers: 4
+      drop_last: false
+      persistent_workers: true
+      pin_memory: false
+    valid:
+      _target_: datamodule.LoaderConfig
+      batch_size: 8
+      shuffle: false
+      num_workers: 4
+      drop_last: false
+      persistent_workers: true
+      pin_memory: false
+    test:
+      _target_: datamodule.LoaderConfig
+      batch_size: 8
+      shuffle: false
+      num_workers: 4
+      drop_last: false
+      pin_memory: false
+  mapper:
+    _target_: datamodule.components.XCEventMapping
+    biggest_cluster: true
+    no_call: false
+callbacks:
+  lr_monitor:
+    _target_: lightning.pytorch.callbacks.LearningRateMonitor
+    logging_interval: step
+  time_tracking:
+    _target_: birdset.callbacks.TimeCallback
+  model_summary:
+    _target_: lightning.pytorch.callbacks.RichModelSummary
+    max_depth: 1
+  rich_progress_bar:
+    _target_: lightning.pytorch.callbacks.RichProgressBar
+  model_checkpoint:
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/callback_checkpoints
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    monitor: val/BCEWithLogitsLoss
+    verbose: false
+    save_last: false
+    save_top_k: 2
+    mode: min
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  work_dir: ${hydra:runtime.cwd}
+  output_dir: ${hydra:runtime.output_dir}
+  dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
+  model_path: ${paths.root_dir}/data_birdset/models/
+  background_path: ${paths.root_dir}/noise_data/background_noise/
+  log_dir: ${paths.root_dir}/logs/
+trainer:
+  _target_: lightning.Trainer
+  default_root_dir: paths.output_dir
+  min_epochs: 1
+  max_epochs: 10
+  accelerator: cpu
+  devices: 1
+  enable_checkpointing: true
+  fast_dev_run: false
+  strategy: auto
+  deterministic: false
+  gradient_clip_val: 0.5
+  accumulate_grad_batches: 1
+  precision: 16
+extras:
+  ignore_warnings: true
+  enforce_tags: false
+  print_config: true
+  plugins: null
+  state_dict_saving_params:
+    symbols: 6
+    exceptions:
+    - loss
+  dump_metrics: true

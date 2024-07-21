@@ -33,7 +33,9 @@ os.environ['PROJECT_ROOT'] = relative_path
 os.environ['HYDRA_FULL_ERROR'] = '1'
 # Relative path
 relative_path = './configs_birdset'
+relative_path_local = './config'
 root = os.path.abspath(relative_path)
+local = os.path.abspath(relative_path_local)
 print(root)
 _HYDRA_PARAMS = {
     "version_base": None,
@@ -44,8 +46,9 @@ _HYDRA_PARAMS = {
 
 @hydra.main(**_HYDRA_PARAMS)
 def train(cfg):
-    print(OmegaConf.to_yaml(cfg))
-
+    # print(OmegaConf.to_yaml(cfg))
+    output_file = local + '/result_config.yaml'
+    OmegaConf.save(cfg, output_file)
     log = utils.get_pylogger(__name__)
     # API key needed - skip
     # logger = utils.instantiate_loggers(cfg.get("logger"))
