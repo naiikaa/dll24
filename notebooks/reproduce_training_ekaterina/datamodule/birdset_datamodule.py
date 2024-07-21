@@ -6,6 +6,7 @@ from datasets import DatasetDict
 
 log = utils.get_pylogger(__name__)
 
+
 class BirdSetDataModule(BaseDataModuleHF):
     """
     A data module for the BirdSet dataset.
@@ -24,23 +25,22 @@ class BirdSetDataModule(BaseDataModuleHF):
     """
 
     def __init__(
-        self,
-        dataset: DatasetConfig = DatasetConfig(
-            data_dir='data_birdset/HSN',
-            dataset_name='HSN',
-            hf_path='DBD-research-group/BirdSet',
-            hf_name='HSN',
-            n_classes=21,
-            n_workers=3,
-            val_split=0.2,
-            task="multilabel",
-            classlimit=500,
-            eventlimit=5,
-            sampling_rate=32000,
-        ),
-        loaders: LoadersConfig = LoadersConfig(),
-        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-        mapper: XCEventMapping = XCEventMapping()
+            self,
+            dataset: DatasetConfig = DatasetConfig(
+                data_dir='data_birdset/HSN',
+                dataset_name='HSN',
+                hf_path='DBD-research-group/BirdSet',
+                hf_name='HSN',
+                n_workers=3,
+                val_split=0.2,
+                task="multilabel",
+                classlimit=500,
+                eventlimit=5,
+                sampling_rate=32000,
+            ),
+            loaders: LoadersConfig = LoadersConfig(),
+            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+            mapper: XCEventMapping = XCEventMapping()
     ):
         """
         Initializes the data module.
@@ -107,7 +107,7 @@ class BirdSetDataModule(BaseDataModuleHF):
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
-            
+
             if self.dataset_config.classlimit and not self.dataset_config.eventlimit:
                 dataset["train"] = self._limit_classes(
                     dataset=dataset["train"],
@@ -136,12 +136,12 @@ class BirdSetDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
-            ) # has to be deterministic for cache loading??
+            )  # has to be deterministic for cache loading??
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
             if self.dataset_config.classlimit or self.dataset_config.eventlimit:
-                log.info(">> Smart Sampling") #!TODO: implement custom caching?
+                log.info(">> Smart Sampling")  # !TODO: implement custom caching?
                 dataset["train"] = self._smart_sampling(
                     dataset=dataset["train"],
                     label_name="ebird_code",

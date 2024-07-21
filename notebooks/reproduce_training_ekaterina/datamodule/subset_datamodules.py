@@ -1,7 +1,8 @@
-from birdset.datamodule.base_datamodule import DatasetConfig
+from .base_datamodule import DatasetConfig
 from .birdset_datamodule import BirdSetDataModule
 
 HF_PATH = 'DBD-research-group/BirdSet'
+
 
 class HSNDataModule(BirdSetDataModule):
     """A BirdSetDataModule for the HSN (high_sierras) dataset."""
@@ -26,17 +27,17 @@ class HSNDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/HSN',
-                                        dataset_name='HSN',
-                                        hf_path=HF_PATH,
-                                        hf_name='HSN',
-                                        n_classes=21,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/HSN',
+                dataset_name='HSN',
+                hf_path=HF_PATH,
+                hf_name='HSN',
+                n_classes=21,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class NBPDataModule(BirdSetDataModule):
@@ -63,17 +64,17 @@ class NBPDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/NBP',
-                                        dataset_name='NBP',
-                                        hf_path=HF_PATH,
-                                        hf_name='NBP',
-                                        n_classes=51,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/NBP',
+                dataset_name='NBP',
+                hf_path=HF_PATH,
+                hf_name='NBP',
+                n_classes=51,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class NESDataModule(BirdSetDataModule):
@@ -100,17 +101,17 @@ class NESDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/NES',
-                                        dataset_name='NES',
-                                        hf_path=HF_PATH,
-                                        hf_name='NES',
-                                        n_classes=89,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/NES',
+                dataset_name='NES',
+                hf_path=HF_PATH,
+                hf_name='NES',
+                n_classes=89,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class PERDataModule(BirdSetDataModule):
@@ -137,17 +138,17 @@ class PERDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/PER',
-                                        dataset_name='PER',
-                                        hf_path=HF_PATH,
-                                        hf_name='PER',
-                                        n_classes=132,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/PER',
+                dataset_name='PER',
+                hf_path=HF_PATH,
+                hf_name='PER',
+                n_classes=132,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class POWDataModule(BirdSetDataModule):
@@ -174,17 +175,17 @@ class POWDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/POW',
-                                        dataset_name='POW',
-                                        hf_path=HF_PATH,
-                                        hf_name='POW',
-                                        n_classes=48,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/POW',
+                dataset_name='POW',
+                hf_path=HF_PATH,
+                hf_name='POW',
+                n_classes=48,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class SNEDataModule(BirdSetDataModule):
@@ -211,17 +212,17 @@ class SNEDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/SNE',
-                                        dataset_name='SNE',
-                                        hf_path=HF_PATH,
-                                        hf_name='SNE',
-                                        n_classes=56,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/SNE',
+                dataset_name='SNE',
+                hf_path=HF_PATH,
+                hf_name='SNE',
+                n_classes=56,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class SSWDataModule(BirdSetDataModule):
@@ -248,17 +249,17 @@ class SSWDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/SSW',
-                                        dataset_name='SSW',
-                                        hf_path=HF_PATH,
-                                        hf_name='SSW',
-                                        n_classes=81,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/SSW',
+                dataset_name='SSW',
+                hf_path=HF_PATH,
+                hf_name='SSW',
+                n_classes=81,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class XCMDataModule(BirdSetDataModule):
@@ -285,17 +286,17 @@ class XCMDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/XCM',
-                                        dataset_name='XCM',
-                                        hf_path=HF_PATH,
-                                        hf_name='XCM',
-                                        n_classes=409,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/XCM',
+                dataset_name='XCM',
+                hf_path=HF_PATH,
+                hf_name='XCM',
+                n_classes=409,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class XCLDataModule(BirdSetDataModule):
@@ -322,17 +323,17 @@ class XCLDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/SSW',
-                                        dataset_name='XCL',
-                                        hf_path=HF_PATH,
-                                        hf_name='XCL',
-                                        n_classes=9734,
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
+                data_dir='/workspace/data_birdset/SSW',
+                dataset_name='XCL',
+                hf_path=HF_PATH,
+                hf_name='XCL',
+                n_classes=9734,
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))
 
 
 class UHHDataModule(BirdSetDataModule):
@@ -359,15 +360,15 @@ class UHHDataModule(BirdSetDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(
-                                        data_dir='/workspace/data_birdset/SSW',
-                                        dataset_name='UHH',
-                                        hf_path=HF_PATH,
-                                        hf_name='UHH',
-                                        n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here? Config said 27 classes.
-                                        n_workers=n_workers,
-                                        val_split=val_split,
-                                        task=task,
-                                        classlimit=classlimit,
-                                        eventlimit=eventlimit,
-                                        sampling_rate=sampling_rate))
-
+                data_dir='/workspace/data_birdset/SSW',
+                dataset_name='UHH',
+                hf_path=HF_PATH,
+                hf_name='UHH',
+                n_classes=25,
+                # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here? Config said 27 classes.
+                n_workers=n_workers,
+                val_split=val_split,
+                task=task,
+                classlimit=classlimit,
+                eventlimit=eventlimit,
+                sampling_rate=sampling_rate))

@@ -1,0 +1,130 @@
+defaults:
+- override hydra_logging: colorlog
+- override job_logging: colorlog
+tags:
+- birdsetDT
+seed: 1
+train: true
+test: true
+logger:
+  wandb:
+    tags: ${tags}
+    group: DT_HSN_efficientnet
+    mode: disabled
+    version: DT_efficientnet_${seed}_${start_time}
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 0.0005
+    weight_decay: 0.0005
+  network:
+    torch_compile: false
+trainer:
+  min_epochs: 1
+  max_epochs: 30
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 5
+  transforms:
+    preprocessing:
+      spectrogram_conversion:
+        n_fft: 2048
+        hop_length: 256
+        power: 2.0
+      melscale_conversion:
+        n_mels: 256
+        n_stft: 1025
+  loaders:
+    train:
+      batch_size: 128
+      num_workers: 32
+    valid:
+      batch_size: 128
+      num_workers: 32
+    test:
+      batch_size: 128
+      num_workers: 32
+  mapper:
+    biggest_cluster: true
+    no_call: false
+callbacks:
+  model_checkpoint:
+    save_last: true
+    every_n_epochs: 5
+_target_: datamodule.components.transforms.BirdSetTransformsWrapper
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: HSN
+  hf_path: DBD-research-group/BirdSet
+  hf_name: HSN
+  seed: ${seed}
+  n_workers: 5
+  val_split: 0.2
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+task: ${datamodule.dataset.task}
+prediction_table: false
+num_gpus: ${trainer.devices}
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 1.0e-05
+  weight_decay: 0.01
+metrics:
+  _target_: birdset.configs_local.module_configs.MultilabelMetricsConfig
+  num_labels: ${datamodule.dataset.n_classes}
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss
+output_activation:
+  _target_: torch.sigmoid
+  _partial_: true
+logging_params:
+  _target_: birdset.modules.base_module.LoggingParamsConfig
+  on_step: false
+  on_epoch: true
+  sync_dist: false
+  prog_bar: true
+model:
+  _target_: birdset.modules.models.efficientnet.EfficientNetClassifier
+  num_classes: null
+  num_channels: 1
+  checkpoint: google/efficientnet-b1
+  local_checkpoint: null
+  cache_dir: ${paths.dataset_path}/models/
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
+    valid_test_only: false
+model_name: efficientnet
+model_type: ${module.network.model_type}
+torch_compile: false
+sampling_rate: ${module.network.sampling_rate}
+normalize_waveform: null
+normalize_spectrogram: true
+max_length: 5
+accelerator: gpu
+devices: 1
+root_dir: ${oc.env:PROJECT_ROOT}
+work_dir: ${hydra:runtime.cwd}
+output_dir: ${hydra:runtime.output_dir}
+dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
+model_path: ${paths.root_dir}/data_birdset/models/
+background_path: ${paths.root_dir}/data_birdset/background_noise/
+log_dir: ${paths.root_dir}/logs/
+job:
+  chdir: true
+run:
+  dir: ${paths.log_dir}/${task_name}/runs/${datamodule.dataset.dataset_name}/${module.network.model_name}/${now:%Y-%m-%d_%H%M%S}
+sweep:
+  dir: ./output/${task_name}/multiruns/${datamodule.dataset.dataset_name}/${module.network.model_name}/${now:%Y-%m-%d_%H%M%S}
+  subdir: ${hydra.job.num}

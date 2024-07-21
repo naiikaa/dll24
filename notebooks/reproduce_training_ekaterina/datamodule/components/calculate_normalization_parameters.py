@@ -20,8 +20,8 @@ root = pyrootutils.setup_root(
 
 _HYDRA_PARAMS = {
     "version_base": None,
-    # "config_path": "../configs",
-    "config_path": str(root / "configs"),
+    # "config_path": "../configs_local",
+    "config_path": str(root / "configs_local"),
     "config_name": "main.yaml",
 }
 

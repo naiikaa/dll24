@@ -22,18 +22,20 @@ from torch_audiomentations.core.transforms_interface import BaseWaveformTransfor
 from torch_audiomentations.utils.dsp import calculate_rms
 from torch_audiomentations.utils.file import find_audio_files_in_paths
 from torch_audiomentations.utils.object_dict import ObjectDict
+import dill as pickle
 
 from typing import Optional
 import torch
-import os 
+import os
 from torch import Tensor
 from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
 from torch_audiomentations.utils.dsp import calculate_rms
 from torch_audiomentations.utils.object_dict import ObjectDict
 from torch_audiomentations.utils.io import Audio
 
+
 def pad_spectrogram_width(
-    spectrogram: torch.Tensor, target_width: int, value: float
+        spectrogram: torch.Tensor, target_width: int, value: float
 ) -> torch.Tensor:
     """
     Pad the input spectrogram along the width axis to reach the desired width.
@@ -64,12 +66,12 @@ def pad_spectrogram_width(
 
 class RandomTimeStretch:
     def __init__(
-        self,
-        prob: float = 0.33,
-        n_freq: int = 96,
-        min_rate: float = 0.8,
-        max_rate: float = 1.25,
-        hop_length: Optional[int] = None,
+            self,
+            prob: float = 0.33,
+            n_freq: int = 96,
+            min_rate: float = 0.8,
+            max_rate: float = 1.25,
+            hop_length: Optional[int] = None,
     ):
         """Random Time Stretch (is applied randomly and selects the rate randomly).
 
@@ -177,15 +179,15 @@ class WaveAugmentations(TypedDict):
 
 class AudioAugmentor:
     def __init__(
-        self,
-        sample_rate: int = 16000,
-        use_spectrogram: bool = False,
-        waveform_augmentations: Optional[WaveAugmentations] = None,
-        spectrogram_augmentations: Optional[SpecAugmentations] = None,
-        n_fft: Optional[int] = 2048,
-        hop_length: Optional[int] = 1024,
-        n_mels: Optional[int] = None,
-        db_scale: bool = False,
+            self,
+            sample_rate: int = 16000,
+            use_spectrogram: bool = False,
+            waveform_augmentations: Optional[WaveAugmentations] = None,
+            spectrogram_augmentations: Optional[SpecAugmentations] = None,
+            n_fft: Optional[int] = 2048,
+            hop_length: Optional[int] = 1024,
+            n_mels: Optional[int] = None,
+            db_scale: bool = False,
     ):
         """
         Initialize the AudioAugmentor, which is used for data augmentation of waveforms and spectrograms.
@@ -411,7 +413,7 @@ class AudioAugmentor:
         return spectrogram
 
     def transform_to_spectrogram(
-        self, waveform: torch.Tensor, power: Optional[float] = 2.0
+            self, waveform: torch.Tensor, power: Optional[float] = 2.0
     ) -> torch.Tensor:
         """
         Transform waveform to spectrogram.
@@ -461,7 +463,7 @@ class AudioAugmentor:
 
         if self.use_spectrogram:
             if (self.spectrogram_augmentations is not None) and (
-                "time_stretch" in self.spectrogram_augmentations
+                    "time_stretch" in self.spectrogram_augmentations
             ):
                 # Time stretching requires a complex-valued STFT, but returns a power spectrogram.
                 spectrogram = self.transform_to_spectrogram(
@@ -490,22 +492,21 @@ class AudioAugmentor:
             return spectrogram_augmented
 
         return waveform_augmented
-    
+
+
 class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     def __init__(
-            self, 
+            self,
             noise_data,
-            min_snr_in_db: float = 3.0, 
-            max_snr_in_db: float = 30.0, 
+            min_snr_in_db: float = 3.0,
+            max_snr_in_db: float = 30.0,
             p: float = 0.5):
-        
-        self.noise_data = noise_data 
+        self.noise_data = noise_data
         self.min_snr_in_db = min_snr_in_db
         self.max_snr_in_db = max_snr_in_db
-        self.p = p 
+        self.p = p
 
-    
-    # def random_background(self, noise_data, target_num_samples):
+        # def random_background(self, noise_data, target_num_samples):
     #     pieces = []
     #     while missing_num_samples > 0:
     #         background_path = random.choice(self.background_paths)
@@ -533,34 +534,37 @@ class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     #         torch.cat([audio.rms_normalize(piece) for piece in pieces], dim=1)
     #     )
 
+
 class Compose:
     def __init__(self, transforms):
         self.transforms = transforms
-    
+
     def __call__(self, inputs, *args, **kwargs):
-        for transforms in self.transforms: 
+        for transforms in self.transforms:
             inputs = transforms(inputs, *args, **kwargs)
-        return inputs 
+        return inputs
+
 
 class AudioTransforms:
     def __init__(self, p=0.5):
-        self.p = p 
+        self.p = p
 
-    def __call__(self, inputs,):
+    def __call__(self, inputs, ):
         if np.random.rand() < self.p:
             return self.apply(inputs)
         else:
-            return inputs    
+            return inputs
+
 
 class BackgroundNoise(AudioTransforms):
     def __init__(self, noise_events=None, p=0.5):
         super().__init__(p=p)
-        
+
         self.noise_events = noise_events
-        self.p = p 
+        self.p = p
         self.max_length = 5
         self.min_length = 1
-    
+
     def _decode(self, path, start, end):
         sr = sf.info(path).samplerate
         if start is not None and end is not None:
@@ -575,40 +579,39 @@ class BackgroundNoise(AudioTransforms):
         audio, _ = sf.read(path, start=start, stop=end)
 
         if audio.ndim != 1:
-            audio = audio.swapaxes(1, 0) ###!TODO: why??
+            audio = audio.swapaxes(1, 0)  ###!TODO: why??
             audio = librosa.to_mono(audio)
 
         return audio
 
-         
     def apply(self, inputs):
 
         augmented_audio = []
         for i, sample in enumerate(inputs):
-            random_idx = random.randint(0, len(self.noise_events["filepath"])-1) # exclude the file itself? 
+            random_idx = random.randint(0, len(self.noise_events["filepath"]) - 1)  # exclude the file itself?
             noise_path = self.noise_events["filepath"][random_idx]
             if self.noise_events["no_call_events"][random_idx]:
                 noise_event = random.choice(self.noise_events["no_call_events"][random_idx])
-            else: # can be empty! 16 times in training high sierras (how?)
-                noise_event = [0,0]
+            else:  # can be empty! 16 times in training high sierras (how?)
+                noise_event = [0, 0]
 
             noise = self._decode(
-                path = noise_path, 
-                start = noise_event[0],
-                end = noise_event[1]
+                path=noise_path,
+                start=noise_event[0],
+                end=noise_event[1]
             )
-            
+
             noise = torch.Tensor(noise).unsqueeze(0)
 
             if sample.size(1) != noise.size(1):
                 padding_length = sample.size(1) - noise.size(1)
-                noise = F.pad(noise, (0,padding_length), "constant", 0)
-            
+                noise = F.pad(noise, (0, padding_length), "constant", 0)
+
             augmented = torchaudio.functional.add_noise(
-                waveform = sample,
-                noise = noise,
-                snr = torch.Tensor([15]) # should also work on a batch?? 
-                #expects no_samples x length
+                waveform=sample,
+                noise=noise,
+                snr=torch.Tensor([15])  # should also work on a batch??
+                # expects no_samples x length
             )
             augmented_audio.append(augmented)
 
@@ -616,9 +619,10 @@ class BackgroundNoise(AudioTransforms):
 
         return augmented_audio
 
-#Mix not officially released yet 
-class MultilabelMix(BaseWaveformTransform):
 
+# Mix not officially released yet
+
+class MultilabelMix(BaseWaveformTransform):
     supported_modes = {"per_example", "per_channel"}
 
     supports_multichannel = True
@@ -628,16 +632,16 @@ class MultilabelMix(BaseWaveformTransform):
     requires_target = False
 
     def __init__(
-        self,
-        min_snr_in_db: float = 0.0,
-        max_snr_in_db: float = 5.0,
-        mix_target: str = "union",
-        mode: str = "per_example",
-        p: float = 0.5,
-        p_mode: str = None,
-        sample_rate: int = None,
-        target_rate: int = None,
-        output_type: Optional[str] = None,
+            self,
+            min_snr_in_db: float = 0.0,
+            max_snr_in_db: float = 5.0,
+            mix_target: str = "union",
+            mode: str = "per_example",
+            p: float = 0.5,
+            p_mode: str = None,
+            sample_rate: int = None,
+            target_rate: int = None,
+            output_type: Optional[str] = None,
     ):
         super().__init__(
             mode=mode,
@@ -654,22 +658,24 @@ class MultilabelMix(BaseWaveformTransform):
 
         self.mix_target = mix_target
         if mix_target == "original":
-            self._mix_target = lambda target, background_target, snr: target
-
+            self._mix_target = self._mix_target_original
         elif mix_target == "union":
-            self._mix_target = lambda target, background_target, snr: torch.maximum(
-                target, background_target
-            )
-
+            self._mix_target = self._mix_target_union
         else:
             raise ValueError("mix_target must be one of 'original' or 'union'.")
 
+    def _mix_target_original(self, target, background_target, snr):
+        return target
+
+    def _mix_target_union(self, target, background_target, snr):
+        return torch.maximum(target, background_target)
+
     def randomize_parameters(
-        self,
-        samples: Tensor = None,
-        sample_rate: Optional[int] = None,
-        targets: Optional[Tensor] = None,
-        target_rate: Optional[int] = None,
+            self,
+            samples: Tensor = None,
+            sample_rate: Optional[int] = None,
+            targets: Optional[Tensor] = None,
+            target_rate: Optional[int] = None,
     ):
 
         batch_size, num_channels, num_samples = samples.shape
@@ -701,11 +707,11 @@ class MultilabelMix(BaseWaveformTransform):
         )
 
     def apply_transform(
-        self,
-        samples: Tensor = None,
-        sample_rate: Optional[int] = None,
-        targets: Optional[Tensor] = None,
-        target_rate: Optional[int] = None,
+            self,
+            samples: Tensor = None,
+            sample_rate: Optional[int] = None,
+            targets: Optional[Tensor] = None,
+            target_rate: Optional[int] = None,
     ) -> ObjectDict:
 
         snr = self.transform_parameters["snr_in_db"]
@@ -728,9 +734,9 @@ class MultilabelMix(BaseWaveformTransform):
             sample_rate=sample_rate,
             targets=mixed_targets,
             target_rate=target_rate,
-        )          
-        
-        
+        )
+
+
 class NoCallMixer():
     """
     A class used to mix no-call samples into the dataset.
@@ -750,41 +756,42 @@ class NoCallMixer():
     n_classes : int
         The total number of distinct classes in the dataset. This parameter should align with the rest of your dataset and model configuration.
     """
+
     def __init__(self, directory, p, sampling_rate, n_classes, length=5):
         self.p = p
         self.sampling_rate = sampling_rate
-        self.length = length 
+        self.length = length
 
         self.paths = self.get_all_file_paths(directory)
         self.no_call_tensor = torch.zeros(n_classes)
-        #self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
+        # self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
 
     def get_all_file_paths(self, directory):
         pattern = os.path.join(directory, '**', '*')
         file_paths = [path for path in glob.glob(pattern, recursive=True) if os.path.isfile(path)]
-        
+
         absolute_file_paths = [os.path.abspath(path) for path in file_paths]
-        
+
         return absolute_file_paths
 
     def __call__(self, input_values, labels):
         for idx in range(len(input_values)):
-            if random.random() < self.p: 
+            if random.random() < self.p:
                 selected_path = random.choice(self.paths)
                 info = sf.info(selected_path)
                 sr = info.samplerate
                 duration = info.duration
-                
+
                 if duration >= self.length:
-                    latest_start = int(duration-self.length) * sr
+                    latest_start = int(duration - self.length) * sr
 
                     start_frame = int(random.randint(0, latest_start))
                     end_frame = start_frame + self.length * sr
                     audio, sr = sf.read(selected_path, start=start_frame, stop=end_frame)
-                
+
                 else:
                     audio, sr = sf.read(selected_path)
-                
+
                 if sr != self.sampling_rate:
                     audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
                     sr = self.sampling_rate
@@ -795,13 +802,11 @@ class NoCallMixer():
                     padding = input_values[idx].numel() - audio.numel()
                     audio = torch.nn.functional.pad(audio, (0, padding))
 
-
                 input_values[idx] = audio
-                labels[idx] = self.no_call_tensor 
-        
+                labels[idx] = self.no_call_tensor
+
         return input_values, labels
 
-    
 
 AudioFile = Union[Path, Text, dict]
 """
@@ -973,7 +978,7 @@ class Audio:
         return samples
 
     def __call__(
-        self, file: AudioFile, sample_offset: int = 0, num_samples: int = None
+            self, file: AudioFile, sample_offset: int = 0, num_samples: int = None
     ) -> Tensor:
         """
 
@@ -1035,7 +1040,7 @@ class Audio:
 
         if original_sample_offset + original_num_samples > original_total_num_samples:
             original_sample_offset = original_total_num_samples - original_num_samples
-            #raise ValueError() # rounding error i guess
+            # raise ValueError() # rounding error i guess
 
         if original_samples is None:
             try:
@@ -1052,11 +1057,11 @@ class Audio:
 
         else:
             original_data = original_samples[
-                :, original_sample_offset : original_sample_offset + original_num_samples
-            ]
+                            :, original_sample_offset: original_sample_offset + original_num_samples
+                            ]
 
         if channel is not None:
-            original_data = original_data[channel - 1 : channel, :]
+            original_data = original_data[channel - 1: channel, :]
 
         result = self.downmix_and_resample(original_data, original_sample_rate)
 
@@ -1069,7 +1074,8 @@ class Audio:
                 result = torch.nn.functional.pad(result, (0, diff))
 
         return result
-    
+
+
 class AddBackgroundNoise(BaseWaveformTransform):
     """
     Add background noise to the input audio.
@@ -1086,16 +1092,16 @@ class AddBackgroundNoise(BaseWaveformTransform):
     requires_target = False
 
     def __init__(
-        self,
-        background_paths: Union[List[Path], List[str], Path, str],
-        min_snr_in_db: float = 3.0,
-        max_snr_in_db: float = 30.0,
-        mode: str = "per_example",
-        p: float = 0.5,
-        p_mode: str = None,
-        sample_rate: int = None,
-        target_rate: int = None,
-        output_type: Optional[str] = None,
+            self,
+            background_paths: Union[List[Path], List[str], Path, str],
+            min_snr_in_db: float = 3.0,
+            max_snr_in_db: float = 30.0,
+            mode: str = "per_example",
+            p: float = 0.5,
+            p_mode: str = None,
+            sample_rate: int = None,
+            target_rate: int = None,
+            output_type: Optional[str] = None,
     ):
         """
 
@@ -1165,11 +1171,11 @@ class AddBackgroundNoise(BaseWaveformTransform):
         )
 
     def randomize_parameters(
-        self,
-        samples: Tensor = None,
-        sample_rate: Optional[int] = None,
-        targets: Optional[Tensor] = None,
-        target_rate: Optional[int] = None,
+            self,
+            samples: Tensor = None,
+            sample_rate: Optional[int] = None,
+            targets: Optional[Tensor] = None,
+            target_rate: Optional[int] = None,
     ):
         """
 
@@ -1207,11 +1213,11 @@ class AddBackgroundNoise(BaseWaveformTransform):
             )
 
     def apply_transform(
-        self,
-        samples: Tensor = None,
-        sample_rate: Optional[int] = None,
-        targets: Optional[Tensor] = None,
-        target_rate: Optional[int] = None,
+            self,
+            samples: Tensor = None,
+            sample_rate: Optional[int] = None,
+            targets: Optional[Tensor] = None,
+            target_rate: Optional[int] = None,
     ) -> ObjectDict:
         batch_size, num_channels, num_samples = samples.shape
 
@@ -1220,17 +1226,18 @@ class AddBackgroundNoise(BaseWaveformTransform):
 
         # (batch_size, num_channels)
         background_rms = calculate_rms(samples) / (
-            10 ** (self.transform_parameters["snr_in_db"].unsqueeze(dim=-1) / 20)
+                10 ** (self.transform_parameters["snr_in_db"].unsqueeze(dim=-1) / 20)
         )
 
         return ObjectDict(
             samples=samples
-            + background_rms.unsqueeze(-1)
-            * background.view(batch_size, 1, num_samples).expand(-1, num_channels, -1),
+                    + background_rms.unsqueeze(-1)
+                    * background.view(batch_size, 1, num_samples).expand(-1, num_channels, -1),
             sample_rate=sample_rate,
             targets=targets,
             target_rate=target_rate,
-        )            
+        )
+
 
 class PowerToDB(nn.Module):
     def __init__(self, ref=1.0, amin=1e-10, top_db=80.0):
@@ -1239,7 +1246,7 @@ class PowerToDB(nn.Module):
         self.ref = ref
         self.amin = amin
         self.top_db = top_db
-    
+
     def forward(self, S):
         # Convert S to a PyTorch tensor if it is not already
         S = torch.as_tensor(S, dtype=torch.float32)
@@ -1275,5 +1282,3 @@ class PowerToDB(nn.Module):
             log_spec = torch.maximum(log_spec, log_spec.max() - self.top_db)
 
         return log_spec
-
-

@@ -47,7 +47,6 @@ class DatasetConfig:
     seed: int = 42
     n_workers: int = 1
     val_split: float = 0.2
-    n_classes: int = 21
     task: Literal["multiclass", "multilabel"] = "multilabel"
     subset: Optional[int] = None
     sampling_rate: int = 32_000
