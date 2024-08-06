@@ -23,11 +23,6 @@ def print_module_structure(start_path, indent=''):
             print(f"{indent}{item}")
 
 
-# TODO:
-# no gpu? *megamind meme comes here*
-# print(torch.cuda.is_available())
-
-# print_module_structure('./')
 relative_path = os.path.abspath('./')
 os.environ['PROJECT_ROOT'] = relative_path
 os.environ['HYDRA_FULL_ERROR'] = '1'

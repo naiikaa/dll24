@@ -86,6 +86,11 @@ datamodule:
     task: ${datamodule.dataset.task}
     max_length: 5
     preprocessing:
+      spectrogram_conversion:
+        _target_: torchaudio.transforms.Spectrogram
+        n_fft: 1024
+        hop_length: 320
+        power: 2.0
       melscale_conversion:
         _target_: torchaudio.transforms.MelScale
         n_mels: 128
