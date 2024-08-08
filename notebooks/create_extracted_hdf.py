@@ -47,7 +47,7 @@ for x in tqdm(dataset['train']):
         continue
     
     extract_events(x,hdf)
-    if len(hdf.keys()) > 2500:
+    if len(hdf.keys()) > 10000:
         break
 
 hdf.close()
