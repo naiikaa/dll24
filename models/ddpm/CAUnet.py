@@ -127,7 +127,8 @@ class Up(nn.Module):
 
     def forward(self, x, skip_x, t):
         x = self.up(x)
-        x = torch.cat([skip_x, x], dim=1)
+        print(skip_x.shape,x.shape)
+        x = torch.cat([skip_x[:,:,:x.shape[2]], x], dim=1)
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None].repeat(1, 1, x.shape[-1])
         return x + emb
@@ -139,22 +140,24 @@ class CAUnet(nn.Module):
         self.n_steps = n_steps
         self.time_dim = time_dim
         
-        self.inc = DoubleConv(c_in, 64)
-        self.down1 = Down(64, 128)
-        self.sa1 = SelfAttention(128)
-        self.down2 = Down(128, 256)
-        self.sa2 = SelfAttention(256)
-        self.down3 = Down(256, 256)
-        self.sa3 = SelfAttention(256)
-        self.bot1 = DoubleConv(256, 256)
-        self.bot3 = DoubleConv(256, 256)
-        self.up1 = Up(512, 128)
-        self.sa4 = SelfAttention(128)
-        self.up2 = Up(256, 64)
-        self.sa5 = SelfAttention(64)
-        self.up3 = Up(128, 64)
-        self.sa6 = SelfAttention(64)
-        self.outc = nn.Conv1d(64, c_out, kernel_size=1)
+        self.inc = DoubleConv(c_in, c_in*2)
+        self.down1 = Down(c_in*2, c_in*4)
+        self.sa1 = SelfAttention(c_in*4)
+        self.down2 = Down(c_in*4, c_in*8)
+        self.sa2 = SelfAttention(c_in*8)
+        self.down3 = Down(c_in*8, c_in*8)
+        self.sa3 = SelfAttention(c_in*8)
+
+        self.bot1 = DoubleConv(c_in*8, c_in*8)
+        self.bot3 = DoubleConv(c_in*8, c_in*8)
+        
+        self.up1 = Up(c_in*16, c_in*4)
+        self.sa4 = SelfAttention(c_in*4)
+        self.up2 = Up(c_in*8, c_in*2)
+        self.sa5 = SelfAttention(c_in*2)
+        self.up3 = Up(c_in*4, c_in*2)
+        self.sa6 = SelfAttention(c_in*2)
+        self.outc = nn.Conv1d(c_in*2, c_out, kernel_size=1)
 
     def pos_encoding(self, t, channels):
         inv_freq = 1.0 / (

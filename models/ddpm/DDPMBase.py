@@ -44,7 +44,7 @@ class DDPMBase(lt.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x = batch
-        x = x.unsqueeze(1)
+        #x = x.unsqueeze(1)
         lable = None
         cont = None
 
@@ -78,7 +78,7 @@ class DDPMBase(lt.LightningModule):
             torch.tensor : Predicted noise that was used to create image at timestep t
         """
 
-        return self.network(x, t, cat,cont)
+        return self.network(x, t)
 
     def subtractNoise(self,  x, t, y, cont):
         """Uses trained networkt to predict the noise in every timestep from n_steps till 0. In every step the predicted noise
