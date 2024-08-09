@@ -22,6 +22,10 @@ from torch.nn import functional as F
 # Borrowed from https://github.com/rosinality/vq-vae-2-pytorch
 
 
+import torch
+from torch import nn
+from torch.nn import functional as F
+
 class Quantize(nn.Module):
     def __init__(self, dim, n_embed, decay=0.99, eps=1e-5):
         super().__init__()
@@ -191,7 +195,6 @@ class VQVAE(nn.Module):
     def forward(self, input, logits_only=False):
         quant_t, quant_b, diff, _, _ = self.encode(input)
         dec = self.decode(quant_t, quant_b)
-        # dec = torch.tanh(dec)
         if logits_only:
             return dec
         return dec, diff
@@ -200,34 +203,27 @@ class VQVAE(nn.Module):
         enc_b = self.enc_b(input)
         enc_t = self.enc_t(enc_b)
 
-        quant_t = self.quantize_conv_t(enc_t).permute(0, 2, 3, 1)
-        quant_t, diff_t, id_t = self.quantize_t(quant_t)
+        quant_t = self.quantize_conv_t(enc_t)
+        quant_t, diff_t, id_t = self.quantize_t(quant_t.permute(0, 2, 3, 1))
         quant_t = quant_t.permute(0, 3, 1, 2)
         diff_t = diff_t.unsqueeze(0)
 
         dec_t = self.dec_t(quant_t)
         enc_b = torch.cat([dec_t, enc_b], 1)
 
-        quant_b = self.quantize_conv_b(enc_b).permute(0, 2, 3, 1)
-        quant_b, diff_b, id_b = self.quantize_b(quant_b)
-        quant_b = quant_b.permute(0, 3, 1, 2)
+        quant_b = self.quantize_conv_b(enc_b)
+        quant_b, diff_b, id_b = self.quantize_b(quant_b.permute(0, 2, 3, 1))
+        quant_b = quant_b.permute(0, 3, 1, 2)  # [batch_size, embed_dim, height/4, width/4]
         diff_b = diff_b.unsqueeze(0)
 
         return quant_t, quant_b, diff_t + diff_b, id_t, id_b
 
     def decode(self, quant_t, quant_b):
-        upsample_t = self.upsample_t(quant_t)
-        quant = torch.cat([upsample_t, quant_b], 1)
-        dec = self.dec(quant)
-
+        upsample_t = self.upsample_t(quant_t)  # [batch_size, embed_dim, height/4, width/4]
+        quant = torch.cat([upsample_t, quant_b], 1)  # [batch_size, 2 * embed_dim, height/4, width/4]
+        dec = self.dec(quant)  # [batch_size, in_channel, height, width]
         return dec
 
     def decode_code(self, code_t, code_b):
-        quant_t = self.quantize_t.embed_code(code_t)
-        quant_t = quant_t.permute(0, 3, 1, 2)
-        quant_b = self.quantize_b.embed_code(code_b)
-        quant_b = quant_b.permute(0, 3, 1, 2)
-
-        dec = self.decode(quant_t, quant_b)
-
-        return dec
+        quant_t = self.quantize_t.embed_code(code_t).permute(0, 3, 1, 2)  # [batch_size, embed_dim, height/8, width/8]
+        quant_b = self.quantize_b.embed_code(code_b).permute(0, 3, 1, 2)  #
