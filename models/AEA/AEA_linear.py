@@ -35,21 +35,31 @@ class AEA_linear(pl.LightningModule):
         self.lr = lr
         
         self.encoder = nn.Sequential(
-            nn.Linear(size,size//4),
+            nn.Linear(size,512),
+            nn.BatchNorm1d(1),
             nn.LeakyReLU(),
-            nn.Linear(size//4,size//8),
+            nn.Linear(512,256),
+            nn.BatchNorm1d(1),
+            nn.LeakyReLU(),
+            nn.Linear(256,128),
+            nn.BatchNorm1d(1),
             nn.LeakyReLU(),
         )
 
         self.attention = nn.Sequential(
-            nn.Linear(size//8,size//8),
+            nn.Linear(128,128),
+            nn.BatchNorm1d(1),
             nn.LeakyReLU(),
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(size//8,size//4),
+            nn.Linear(128,256),
+            nn.BatchNorm1d(1),
             nn.LeakyReLU(),
-            nn.Linear(size//4,size),
+            nn.Linear(256,512),
+            nn.BatchNorm1d(1),
+            nn.LeakyReLU(),
+            nn.Linear(512,size),
             nn.LeakyReLU(),
         )
             
