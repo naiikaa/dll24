@@ -21,5 +21,6 @@ data_birdset
 /notebooks/reproduce_training_ekaterina/birdset_modules
 /notebooks/reproduce_training_ekaterina/configs_birdset
 *.hdf5
-notebooks/reproduce_training_ekaterina/gen_model_test/epoch=5-step=30005.ckpt
+notebooks/reproduce_training_ekaterina/gen_model_test/checkpoints/epoch=5-step=30005.ckpt
 *.npy
+*.ckpt

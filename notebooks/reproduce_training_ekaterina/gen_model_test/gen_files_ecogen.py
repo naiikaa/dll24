@@ -1,5 +1,9 @@
 import os
+
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torch import nn
+from torchvision.utils import save_image
+from IPython.display import Audio
 from notebooks.reproduce_training_ekaterina import BirdSetDataModule, DatasetConfig
 from datasets import load_dataset
 import lightning as lt
@@ -8,6 +12,7 @@ import soundfile as sf
 import torch.nn.functional as F
 from tqdm.auto import tqdm
 
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # initiate the data module
 os.environ['HYDRA_FULL_ERROR'] = '1'
 import torch
@@ -83,13 +88,19 @@ class Lightningwrapper(lt.LightningModule):
         self.log('train_loss', loss)
         return loss
 
+    def encode(self, x):
+        return self.model.encode(x)
+
+    def decode(self, quant_t, quant_b):
+        return self.model.decode(quant_t, quant_b)
+
     def configure_optimizers(self):
         return torch.optim.Adam(self.model.parameters(), lr=3e-4)
 
 
 def main() -> None:
     args = parser.parse_args()
-    model = VQVAE(in_channel=1)
+    model = VQVAE(in_channel=64)
     # if args.model_path:
     #    model = load_model(model, args.model_path, device=args.device)
 
@@ -115,8 +126,9 @@ def main() -> None:
     dataloader = DataLoader(dataset, batch_size=64, num_workers=30)
 
     # Train model with audio waveforms
-    trainer = lt.Trainer(max_epochs=3)
+    trainer = lt.Trainer(max_epochs=20)
     trainer.fit(lt_model, dataloader)
+    torch.save(lt_model.state_dict(), './checkpoints/epoch=20.ckpt')
 
 
 if __name__ == "__main__":
