@@ -100,7 +100,7 @@ class Lightningwrapper(lt.LightningModule):
 
 def main() -> None:
     args = parser.parse_args()
-    model = VQVAE(in_channel=64)
+    model = VQVAE(in_channel=1)
     # if args.model_path:
     #    model = load_model(model, args.model_path, device=args.device)
 
@@ -126,7 +126,7 @@ def main() -> None:
     dataloader = DataLoader(dataset, batch_size=64, num_workers=30)
 
     # Train model with audio waveforms
-    trainer = lt.Trainer(max_epochs=20)
+    trainer = lt.Trainer(max_epochs=30)
     trainer.fit(lt_model, dataloader)
     torch.save(lt_model.state_dict(), './checkpoints/epoch=20.ckpt')
 
