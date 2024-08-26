@@ -5,20 +5,21 @@ import soundfile as sf
 from datasets import load_dataset
 import uuid
 from tqdm.auto import tqdm
+import librosa
 
 wanted_keys = ['audio', 'soundfile_id', 'ebird_code', 'ebird_code_multilabel', 'ebird_code_secondary',
                'lat','long','microphone','source','local_time','quality']
 
 dataset = load_dataset('DBD-research-group/BirdSet','XCM')
 
-hdf = h5py.File('test.hdf5', 'w')
+hdf = h5py.File('test_24k.hdf5', 'w')
 
-samplerate = 32000
+samplerate = 24000
 
 def extract_events(x,hdf):
     detected_events = np.array(x['detected_events'])
     event_clusters = np.array(x['event_cluster'])
-    data, _ = sf.read(x['filepath'])
+    data, _ = librosa.load(x['filepath'], sr=samplerate)
     soundfile_id = str(uuid.uuid4())
         
 
