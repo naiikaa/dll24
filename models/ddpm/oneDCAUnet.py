@@ -178,14 +178,14 @@ class oneDCAUnet(nn.Module):
         x4 = self.down3(x3, t)
         x4 = self.sa3(x4)
 
-        xm = self.bot1(x4)
-        xm = self.bot3(xm)
-        print(xm.shape,x4.shape)
-        x = self.up1(xm, x4, t)
+        x4 = self.bot1(x4)
+        x4 = self.bot3(x4)
+     
+        x = self.up1(x4, x3, t)
         x = self.sa4(x)
-        x = self.up2(x, x3, t)
+        x = self.up2(x, x2, t)
         x = self.sa5(x)
-        x = self.up3(x, x2, t)
+        x = self.up3(x, x1, t)
         x = self.sa6(x)
         output = self.outc(x)
         return output

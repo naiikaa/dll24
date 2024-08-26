@@ -127,7 +127,13 @@ class Up(nn.Module):
 
     def forward(self, x, skip_x, t):
         x = self.up(x)
-        print(skip_x.shape,x.shape)
+        padding = skip_x.shape[-1] - x.shape[-1]
+        
+        if padding > 0:
+            x = F.pad(x, (0, padding))
+        elif padding < 0:
+            skip_x = F.pad(skip_x, (0, -padding))
+
         x = torch.cat([skip_x, x], dim=1)
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None].repeat(1, 1, x.shape[-1])
@@ -178,14 +184,14 @@ class CAUnet(nn.Module):
         x4 = self.down3(x3, t)
         x4 = self.sa3(x4)
 
-        xm = self.bot1(x4)
-        xm = self.bot3(xm)
-        print(xm.shape,x4.shape)
-        x = self.up1(xm, x4, t)
+        x4 = self.bot1(x4)
+        x4 = self.bot3(x4)
+     
+        x = self.up1(x4, x3, t)
         x = self.sa4(x)
-        x = self.up2(x, x3, t)
+        x = self.up2(x, x2, t)
         x = self.sa5(x)
-        x = self.up3(x, x2, t)
+        x = self.up3(x, x1, t)
         x = self.sa6(x)
         output = self.outc(x)
         return output

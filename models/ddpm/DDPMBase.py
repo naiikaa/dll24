@@ -45,7 +45,7 @@ class DDPMBase(lt.LightningModule):
     def training_step(self, batch, batch_idx):
         x = batch
         
-        x = x.unsqueeze(1)
+        #x = x.unsqueeze(1)
         lable = None
         cont = None
 
