@@ -44,7 +44,6 @@ class DDPMBase(lt.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x = batch
-        
         #x = x.unsqueeze(1)
         lable = None
         cont = None
@@ -58,7 +57,7 @@ class DDPMBase(lt.LightningModule):
         
         
         predNoise = self.predictNoise(noisy_images, t.squeeze(),cat=lable,cont=cont)
-
+        #mse = F.mse_loss(predNoise, noise)
         rmse = torch.sqrt(F.mse_loss(predNoise, noise))
         #mmd = abs(new_mmd(predNoise[:,0,:],noise,self.device))
 
@@ -125,5 +124,7 @@ class DDPMBase(lt.LightningModule):
         return alphas_cp.sqrt().view(view_shape) * image + (1-alphas_cp).sqrt().view(view_shape) * noise
     
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(),lr=3e-4)
-        return optimizer
+        lr = 3e-3
+        optimizer = torch.optim.AdamW(self.parameters(), lr=lr)
+        sheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=lr/10)
+        return [optimizer], [sheduler]
