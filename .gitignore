@@ -25,3 +25,4 @@ notebooks/reproduce_training_ekaterina/gen_model_test/checkpoints/epoch=5-step=3
 *.npy
 *.ckpt
 *.dac
+notebooks/reproduce_training_ekaterina/gen_model_test/wavenet_model.pth
