@@ -106,7 +106,7 @@ def main() -> None:
 
     dm = BirdSetDataModule(
         dataset=DatasetConfig(
-            data_dir='./data_birdset/HSN',
+            data_dir='../data_birdset/HSN',
             dataset_name='HSN',
             hf_path='DBD-research-group/BirdSet',
             hf_name='HSN',
@@ -128,7 +128,7 @@ def main() -> None:
     # Train model with audio waveforms
     trainer = lt.Trainer(max_epochs=30)
     trainer.fit(lt_model, dataloader)
-    torch.save(lt_model.state_dict(), './checkpoints/epoch=20.ckpt')
+    torch.save(lt_model.state_dict(), '../checkpoints/epoch=20.ckpt')
 
 
 if __name__ == "__main__":

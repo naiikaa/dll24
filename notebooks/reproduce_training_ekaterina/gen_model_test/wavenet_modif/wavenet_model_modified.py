@@ -1,18 +1,17 @@
 import h5py
 import torchaudio
-import random
-from datasets import load_dataset
 import numpy as np
-from matplotlib import pyplot as plt
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
-from IPython.display import Audio
 from torch.autograd import Variable
 import torch.optim as optim
-import torch.nn.functional as F
 from tqdm.auto import tqdm
 
+# modified version of wavenet model from:
+# https://github.com/prantoshdas/Pytorch_Wavenet/blob/main/Wavent_notebook/Final_wavenet2.ipynb
+
+torch.cuda.empty_cache()
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -24,10 +23,9 @@ class OneHot(nn.Module):
 
     def forward(self, x):
         x = x.to(device)
-        x = x.long()  # Ensure x is of type LongTensor
+        x = x.long()
         batch_size, seq_len = x.size()
         x = x.view(-1)
-
         x_one_hot = self.ones.index_select(0, x)
         x_one_hot = x_one_hot.view(batch_size, seq_len, self.MU)
         x_one_hot = x_one_hot.transpose(1, 2)
@@ -76,11 +74,11 @@ class Wavenet(nn.Module):
         self.post_conv2 = nn.Conv1d(in_channels=n_skip_channels, out_channels=n_category, kernel_size=1)
 
     def forward(self, x):
-        x = x.to(device)
-        x = self.One_hot(x)  # One-hot encoding
-        x = self.input_convs(x)  # Input convolution
+        x.to(device)
+        x = self.One_hot(x)
+        ### shape of x [batch_size, n_category, seq_len]
+        x = self.input_convs(x)  ### shape [batch_size, n_category, n_residual]
         skip_con = 0
-
         for i in range(self.dilation_depth * self.n_blocks):
             dilation = self.dilations[i]
             res = x
@@ -97,12 +95,10 @@ class Wavenet(nn.Module):
                 skip_con = skip_con[:, :, -s.size(2):] + s
             x = self.residual_convs[i](x)
             x = x + res[:, :, dilation * (self.kernel_size - 1):]
-
         x = torch.relu(skip_con)
         x = torch.relu(self.post_conv1(x))
         x = self.post_conv2(x)
 
-        # Adjust output length to match the target length
         if x.size(2) > self.seq_len_segment:
             x = x[:, :, :self.seq_len_segment]
         elif x.size(2) < self.seq_len_segment:
@@ -111,98 +107,33 @@ class Wavenet(nn.Module):
 
         return x
 
-    def generate(self, seed_input, num_samples=100):
-        gen_list = seed_input.squeeze().tolist()
-        assert len(gen_list) >= sum(self.dilations) + 1, "Seed input length too short"
-
-        for _ in range(num_samples):
-            if len(gen_list) < sum(self.dilations) + 1:
-                padding_length = sum(self.dilations) + 1 - len(gen_list)
-                gen_list = [0] * padding_length + gen_list
-
+    def generate(self, input, num_samples=100):
+        gen_list = input.data.tolist()
+        for _ in tqdm(range(num_samples)):
             x = Variable(torch.LongTensor(gen_list[-sum(self.dilations) - 1:]))
-            x = x.unsqueeze(0).to(device)  # Add batch dimension
-            with torch.no_grad():
-                y = self.forward(x)
-                y = y.squeeze(0)  # Remove batch dimension
-
+            y = self.forward(x)
             _, i = y.max(dim=1)
-            gen_list.append(i[-1].item())
+            gen_list.append(i.data.tolist()[-1])
         return gen_list
 
+    def generate_fix(self, input, num_samples=100):
+        gen_list = input.data.tolist()
+        with torch.no_grad():
+            for _ in tqdm(range(num_samples)):
+                x = torch.LongTensor(gen_list[-sum(self.dilations) - 1:])
+                y = self.forward(x)
+                _, i = y.max(dim=1)
+                gen_list.append(i.tolist()[-1])
+        return gen_list
 
-class BirdsetDataset(Dataset):
-    def __init__(self, hsn, seq_len_segment, mu):
-        # self.hsn = hsn
-        self.hsn = self.createData(hsn)
-        self.seq_len_segment = seq_len_segment
-        self.size = 2 ** 15
-        self.mu = mu
-        self.data_list = []
-        for sample in self.hsn:
-            data, _ = preprocess(sample)
-            if data.shape[1] >= self.seq_len_segment:
-                max_val = torch.max(data)
-                min_val = torch.min(data)
-                if max_val > torch.abs(min_val):
-                    data = data / max_val
-                else:
-                    data = data / torch.abs(min_val)
-                self.data_list.append(data)
-
-    def __len__(self):
-        return len(self.data_list)
-
-    def __getitem__(self, idx):
-        data = self.data_list[idx]
-        start = np.random.randint(0, data.shape[1] - self.seq_len_segment)
-        ys = data[:, start:start + self.seq_len_segment]
-        ys = mulaw_quantize(ys, self.mu)
-        ys = ys.squeeze(0)
-        return ys.to(device)
-
-    def createData(self, hdf):
-        data = []
-        keys = list(hdf.keys())
-
-        self.num_rows = len(keys)
-        for key in tqdm(keys):
-            sample = hdf[key]['audio'][:]
-            if len(sample) > self.size:
-                self.num_rows -= 1
-                continue
-
-            if len(sample) < self.size:
-                sample = np.pad(sample, (0, self.size - len(sample)), 'constant')
-
-            data.append(sample)
-
-        return torch.tensor(np.array(data)).float()
-
-
-class SnippetDatasetHDF(Dataset):
-    def __init__(self, hdf, seq_len_segment, mu, scaling='minmax'):
+class SnippetDatasetHSN(Dataset):
+    def __init__(self, hsn, seq_len_segment, mu, scaling='minmax'):
         self.num_rows = 0
-        self.size = 2 ** 15
+        self.size = seq_len_segment
         self.scaling = scaling
-        self.hsn = self.createData(hsn)
         self.seq_len_segment = seq_len_segment
-        self.size = 2 ** 15
         self.mu = mu
-        self.data = []
-
-        for sample in self.hsn:
-            data = preprocess(sample)
-            # if data.shape[0] >= self.seq_len_segment:
-            max_val = torch.max(data)
-            min_val = torch.min(data)
-            if max_val > torch.abs(min_val):
-                data = data / max_val
-            else:
-                data = data / torch.abs(min_val)
-            self.data.append(data)
-
-        self.data = torch.stack(self.data)
+        self.data = self.createData(hsn)
 
         if scaling == 'standard':
             self.mean = self.data.mean()
@@ -232,9 +163,21 @@ class SnippetDatasetHDF(Dataset):
 
             if len(sample) < self.size:
                 sample = np.pad(sample, (0, self.size - len(sample)), 'constant')
-
             data.append(sample)
 
+        # same as above - ignore
+        '''
+        dataset = []
+        for sample in data:
+            sample = torch.from_numpy(sample)
+            max_val = torch.max(sample)
+            min_val = torch.min(sample)
+            if max_val > torch.abs(min_val):
+                sample = sample / max_val
+            else:
+                sample = sample / torch.abs(min_val)
+            dataset.append(sample)
+        '''
         return torch.tensor(np.array(data)).float()
 
     def retransform(self, data):
@@ -302,56 +245,3 @@ def preprocess(batch):
     if len(audio.shape) > 1:
         audio = audio.mean(dim=0)
     return audio.unsqueeze(0)
-
-
-# hsn = load_dataset('DBD-research-group/BirdSet', 'HSN')
-hsn = h5py.File('./test_24k.hdf5', 'r')
-subset_percentage = 0.5
-seq_len_segment = 4000
-mu = 128
-batch_size = 8
-# dataset = BirdsetDataset(hsn, seq_len_segment, mu)
-# dataset = SnippetDatasetHDF(hsn)
-dataset = SnippetDatasetHDF(hsn, seq_len_segment, mu)
-# hsn.close()
-# subset_indices = random.sample(range(len(hsn['train'])), int(len(hsn['train']) * subset_percentage))
-# hsn = hsn['train'].select(subset_indices)
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-dilation_depth = 10
-n_blocks = 2
-n_dilation_channels = 24
-n_residual_channels = 24
-n_skip_channels = 128
-n_category = mu
-kernel_size = 2
-model = Wavenet(dilation_depth, n_blocks, n_dilation_channels, n_residual_channels, n_skip_channels, n_category,
-                kernel_size, seq_len_segment=seq_len_segment)
-model.to(device)
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-epochs = 35
-model.train()
-for epoch in range(epochs):
-    for i, inputs in enumerate(dataloader):
-        inputs = inputs.to(device)
-
-        optimizer.zero_grad()
-        outputs = model(inputs)
-
-        outputs = outputs.permute(0, 2, 1)
-
-        batch_size, seq_len, num_classes = outputs.size()
-        outputs = outputs.contiguous().view(-1, num_classes)
-        targets = inputs.contiguous().view(-1)
-
-        targets = targets.long()
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
-        if epoch % 10 == 0:
-            print(f'[Epoch {epoch + 1}, Batch {i + 1}] loss: {loss.item() / 10:.4f}')
-
-print('saving model')
-torch.save(model.state_dict(), 'wavenet_model.pth')
