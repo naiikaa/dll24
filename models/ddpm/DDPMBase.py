@@ -50,8 +50,7 @@ class DDPMBase(lt.LightningModule):
 
         noise = torch.randn_like(x)
 
-        t = torch.randint(
-            0, self.n_steps, (x.shape[0], 1), dtype=torch.int64).to('cuda')
+        t = torch.randint(0, self.n_steps, (x.shape[0], 1), dtype=torch.int64).to('cuda')
         
         noisy_images = self.addNoise(x, t, noise)
         
@@ -92,6 +91,7 @@ class DDPMBase(lt.LightningModule):
             torch.tensor : Less noisy image/sample at timestemp t-1 using the predicted noise from network.
         """
         t_batch = t.repeat([x.shape[0],1])
+        
         t_batch2 = t.repeat([x.shape[0],x.shape[1],1])
         alpha_t = self.alphas[t_batch2]
         alphas_cp = self.alphas_cumprod[t_batch2]        
@@ -104,6 +104,7 @@ class DDPMBase(lt.LightningModule):
             sigma_t = beta_t.sqrt()
 
             prevImage = prevImage + sigma_t * torch.randn_like(x)
+        
         return prevImage
 
     def addNoise(self, image, t, noise):
@@ -124,7 +125,13 @@ class DDPMBase(lt.LightningModule):
         return alphas_cp.sqrt().view(view_shape) * image + (1-alphas_cp).sqrt().view(view_shape) * noise
     
     def configure_optimizers(self):
-        lr = 3e-3
+        lr = 3e-4
         optimizer = torch.optim.AdamW(self.parameters(), lr=lr)
         sheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=lr/10)
         return [optimizer], [sheduler]
+    
+    def sample(self, batchsize,shape):
+        x = torch.randn(batchsize, *shape).to('cuda')
+        for i in range(self.n_steps-1,0,-1):
+            x = self.subtractNoise(x, torch.tensor([i]).repeat([batchsize,1]).to('cuda'),None,None)
+        return x

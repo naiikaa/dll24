@@ -3,6 +3,7 @@ import soundfile as sf
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import Audio
+from tqdm.auto import tqdm
 from datasets import load_dataset
 dataset = load_dataset('DBD-research-group/BirdSet','XCM')
 
@@ -34,7 +35,37 @@ plt.show()
 print(len(combined))
 
 Audio(combined, rate=samplerate)
+#%%
+max_length = 0
+for i in tqdm(range(len(dataset['train']))):
+    data, _ = sf.read(dataset['train'][i]['filepath'])
+    if len(data) > max_length:
+        max_length = len(data)
+print("Longest length:", max_length)
+#%%
+print(max)
+#%%
+colors = ['teal','orange','coral','purple']
+datas = []
+for i in range(4):
+    data , _ = sf.read(dataset['train'][i]['filepath'])
+    datas.append(data)
+    print(len(data))
 
+fig, axs = plt.subplots(4,1,figsize=(10,20))
+for i in range(4):
+    axs[i].set_xlim(0,2494848)
+    axs[i].plot(datas[i],color = colors[i])
+    axs[i].set_ylim(-0.2,0.2)
+    axs[i].xaxis.set_visible(False)
+    axs[i].grid()
+plt.show()
+#%%
+plt.figure(figsize=(10,5))
+plt.plot(datas[2],color = colors[0])
+plt.xlim(0,510021)
+plt.ylim(-0.4,0.4)
+plt.axis('off')
 #%%
 Audio(data, rate=samplerate)
 #%%
