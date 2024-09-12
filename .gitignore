@@ -13,7 +13,7 @@ __pycache__/
 *.csv
 lightning_logs
 *.wav
-
+*.pth
 .idea
 notebooks/reproduce_training_ekaterina/noise_data/*
 data_birdset

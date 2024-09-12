@@ -105,7 +105,7 @@ class LatentDataset(Dataset):
         self.max = self.data.max()
         self.std = self.data.std()
         self.mean = self.data.mean()
-        self.transform('normalize')
+        self.transform('none')
 
 
     def createData(self, h5_file):
@@ -217,4 +217,4 @@ torch.save(discriminator.state_dict(), "models/discriminator.pth")
 
 #Save sample batch
 os.makedirs('samples', exist_ok=True)
-torch.save(dataset.inverse_transform(gen_imgs.data[:25]), "samples/sample_batch.pth")
+torch.save(gen_imgs.data[:25], "samples/sample_batch.pth")
