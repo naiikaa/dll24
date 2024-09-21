@@ -210,11 +210,3 @@ for epoch in range(opt.n_epochs):
             save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
         batches_done += 1
 
-# Save model
-os.makedirs('models', exist_ok=True)
-torch.save(generator.state_dict(), "models/generator.pth")
-torch.save(discriminator.state_dict(), "models/discriminator.pth")
-
-#Save sample batch
-os.makedirs('samples', exist_ok=True)
-torch.save(gen_imgs.data[:25], "samples/sample_batch.pth")
