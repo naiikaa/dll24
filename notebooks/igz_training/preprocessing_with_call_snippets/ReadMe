@@ -1,1 +1,9 @@
 Preprocess the whole Training data by means of existed call snippets.
+- call snippets are yielded by means of another notebook `igz_call_snippets.ipynb`
+- Then used to preprocess the whole call snippets instead of preprocessing 5 seconds files which were split from the very first 5 seconds of the audio files.
+
+* Now we yield a better results to train and of course could lead to better result in our model. and of course more 5 seconds files. 
+- Each file has the identity name which shows:
+      * The `bird_code`
+      * The index of the bird in dataset
+      * The index of event
