@@ -60,6 +60,33 @@ for x in tqdm(dataset['train']):
 
 hdf.close()
 
+
+def unpack_hdf5(hdf5_file, output_dir, save_as_wav=True, sampling_rate=16000):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    with h5py.File(hdf5_file, 'r') as f:
+        def recursively_extract(name, obj):
+            print(name)
+            if 'audio' in name:
+                if isinstance(obj, h5py.Dataset):
+                    data = obj[()]
+                    if save_as_wav:
+                        output_path = os.path.join(output_dir, f"{name.replace('/', '_')}.wav")
+                        sf.write(output_path, data, samplerate=sampling_rate)
+                        print(f"Saved {name} as WAV file at {output_path}")
+                    else:
+                        output_path = os.path.join(output_dir, f"{name.replace('/', '_')}.npy")
+                        np.save(output_path, data)
+                        print(f"Saved {name} as numpy array at {output_path}")
+
+        f.visititems(recursively_extract)
+
+
+hdf5_file = './HSN.hdf5'
+output_dir = './unpacked_data'
+unpack_hdf5(hdf5_file, output_dir, save_as_wav=True, sampling_rate=16000)
+
 def preprocess_wav(file_path):
     waveform, sample_rate = torchaudio.load(file_path)
     n_fft = 2048  # higher FFT size for better frequency resolution
@@ -189,7 +216,7 @@ def pad_collate(batch):
     return torch.stack(batch)
 
 
-dataset = WavDataset(file_dir='../unpacked_data')
+dataset = WavDataset(file_dir='./unpacked_data')
 data_loader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=pad_collate)
 
 
