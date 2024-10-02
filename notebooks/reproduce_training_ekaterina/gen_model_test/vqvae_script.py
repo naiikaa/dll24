@@ -18,7 +18,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 wanted_keys = ['audio', 'soundfile_id', 'ebird_code', 'ebird_code_multilabel', 'ebird_code_secondary',
                'lat', 'long', 'microphone', 'source', 'local_time', 'quality']
 
-dataset = load_dataset('DBD-research-group/BirdSet', 'HSN')
+dataset = load_dataset('DBD-research-group/BirdSet', 'HSN', trust_remote_code=True)
 
 hdf = h5py.File('HSN.hdf5', 'w')
 samplerate = 24000
