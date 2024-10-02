@@ -24,6 +24,7 @@ hdf = h5py.File('HSN.hdf5', 'w')
 samplerate = 24000
 
 def extract_events(x, hdf):
+    print('extracting events')
     detected_events = np.array(x['detected_events'])
     event_clusters = np.array(x['event_cluster'])
     data, _ = librosa.load(x['filepath'], sr=samplerate)
