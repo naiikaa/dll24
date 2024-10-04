@@ -111,13 +111,6 @@ def compress_dynamic_range(waveform, threshold=-20.0, ratio=5.0):
     compressed_waveform = 10 ** (db_waveform / 20)
     return compressed_waveform
 
-
-# test
-file_path = '../unpacked_data/0aee9bcf-8656-40b6-b915-35ec63d85ba8_audio.wav'
-mel_spectrogram = preprocess_wav(file_path)
-print(mel_spectrogram.shape)
-
-
 class Encoder(nn.Module):
     def __init__(self, in_channels, hidden_channels, n_embeddings, embedding_dim):
         super(Encoder, self).__init__()
