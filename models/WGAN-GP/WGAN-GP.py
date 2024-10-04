@@ -26,9 +26,9 @@ torch.set_float32_matmul_precision('medium')
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=100, help="number of epochs of training")
-parser.add_argument("--batch_size", type=int, default=2, help="size of the batches")
-parser.add_argument("--lr", type=float, default=5e-6, help="adam: learning rate")
+parser.add_argument("--n_epochs", type=int, default=10, help="number of epochs of training")
+parser.add_argument("--batch_size", type=int, default=4, help="size of the batches")
+parser.add_argument("--lr", type=float, default=5e-5, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
@@ -63,7 +63,7 @@ class Generator(nn.Module):
             *block(256, 512),
             *block(512, 1024),
             nn.Linear(1024, int(np.prod(img_shape))),
-            nn.Sigmoid()
+            nn.Tanh()
         )
 
     def forward(self, z):
@@ -91,7 +91,7 @@ class Discriminator(nn.Module):
 
 
 # Loss weight for gradient penalty
-lambda_gp = 200
+lambda_gp = 500
 
 # Initialize generator and discriminator
 generator = Generator()
@@ -191,6 +191,7 @@ batches_done = 0
 g_losses = []
 d_losses = []
 for epoch in range(opt.n_epochs):
+    
     for i, imgs in enumerate(dataloader):
 
         # Configure input
