@@ -69,8 +69,8 @@ hdf.close()
 model = Unet(
     dim = 64,
     channels = 1,
-    dim_mults = (1, 2, 4,8,16),
-    flash_attn = False,
+    dim_mults = (1, 2, 4),
+    flash_attn = True,
 )
 
 diffusion = GaussianDiffusion(
