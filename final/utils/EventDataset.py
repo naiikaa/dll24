@@ -57,3 +57,5 @@ class EventDataset(Dataset):
             return data * self.std + self.mean
         elif self.scaling == 'normalize':
             return data * (self.max - self.min) + self.min
+        elif self.scaling == 'none':
+            return data

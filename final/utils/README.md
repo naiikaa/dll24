@@ -28,3 +28,7 @@ Using the [events_to_latent](events_to_latent.py) script we can take the extract
 - `--dac_model_type` : pretrained model types for DAC (default: "24kHz)
 - `--save_path` : path to save the latent hdf5 file to (default: "./extraced_latents.hdf5")
 
+## Dataset classes for events and latents
+We also provide dataset classes that can be used for dataloaders. In both cases the samples are loaded in by providing a hdf5 file and can be scaled via normalization or standardization. 
+- [EventDataset](EventDataset.py)
+- [LatentDataset](LatentDataset.py)
