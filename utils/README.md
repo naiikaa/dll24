@@ -19,6 +19,9 @@ print(hdf[list(hdf.keys())[0]].keys())
 ```
 Each sample has an unique ID and can later be matched to a certain latent.
 
+![image](https://github.com/user-attachments/assets/5d86f704-961a-46d0-8feb-a9ad275b5e20)
+
+
 ## compressing events to latents
 Events can now be compressed into latents via [DAC](https://github.com/descriptinc/descript-audio-codec) an audio compression library that takes raw waveforms and compresses them into other representation. The 24kHz model is capable of compressing and decompressing bird audio samples without retraining or any fine tunning see the [DAC test notebook]() to get an idea.
 Using the [events_to_latent](events_to_latent.py) script we can take the extracted events hdf5 file from above and create another hdf5 file which now only contains compressed event latents with the corresponding unique ID. Again we can make some specifications:
@@ -27,6 +30,9 @@ Using the [events_to_latent](events_to_latent.py) script we can take the extract
     - also available : "standardize", "none"
 - `--dac_model_type` : pretrained model types for DAC (default: "24kHz)
 - `--save_path` : path to save the latent hdf5 file to (default: "./extraced_latents.hdf5")
+
+![image](https://github.com/user-attachments/assets/467834ef-f6c3-4a50-993c-07a1117babde)
+
 
 ## Dataset classes for events and latents
 We also provide dataset classes that can be used for dataloaders. In both cases the samples are loaded in by providing a hdf5 file and can be scaled via normalization or standardization. 
