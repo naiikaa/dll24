@@ -1,5 +1,5 @@
 # Deep Learning Lab 2024 - Team Generative Models 
-The foundation for this project is the BirdSet dataset provide by the [**DBD-research-group**](github.com/DBD-research-group).
+The foundation for this project is the BirdSet dataset provide by the [**DBD-research-group**](https://github.com/DBD-research-group).
 
 sources:
 [huggingface](https://huggingface.co/datasets/DBD-research-group/BirdSet) | 
