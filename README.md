@@ -27,6 +27,9 @@ Leftovers of the exploitive phase, lots of notebooks and tests.
 ### [utils](utils/README.md)
 Extracting events from BirdSet, compression into latent samples and custom dataset classes.
 
+![image](https://github.com/user-attachments/assets/07e70605-da8e-4a7b-9789-05bda16fc2c7)
+
+
 ## Members:
 - Ekaterina S.
 - Iman G.
