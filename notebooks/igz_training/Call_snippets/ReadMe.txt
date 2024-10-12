@@ -19,9 +19,9 @@
 - The code includes checks for missing audio paths and invalid event formats.
 - It prints messages when it skips samples due to missing data.
 
-* Dependencies:
-import os
-import librosa
-import soundfile as sf
-import numpy as np
-from datasets import load_dataset
+## Installation
+
+To install the necessary dependencies, run:
+
+```bash
+pip install -r requirements.txt
