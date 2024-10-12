@@ -220,7 +220,6 @@ def generate(model, initial_input, num_samples, quantization_channels=256):
 initial_input = torch.zeros(1, 1, 1).long()
 num_samples = 22050 * Here’s the continuation and completion of the comment-refined version:
 
-```python
 # Generate 5 seconds of synthetic audio
 num_samples = 22050 * 5  # 5 seconds at 22050 Hz sample rate
 print("Generating synthetic audio...")
