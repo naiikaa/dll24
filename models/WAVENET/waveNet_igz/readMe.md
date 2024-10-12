@@ -1,5 +1,6 @@
 # WaveNet
 
+
 ## Overview
 
 Implements a WaveNet model for generating synthetic audio using PyTorch. It processes bird audio samples from the BirdSet dataset, encodes them using mu-law encoding, and generates new audio snippets using the trained WaveNet model.
