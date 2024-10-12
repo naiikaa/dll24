@@ -21,7 +21,7 @@ Each sample has an unique ID and can later be matched to a certain latent.
 
 ## compressing events to latents
 Events can now be compressed into latents via [DAC](https://github.com/descriptinc/descript-audio-codec) an audio compression library that takes raw waveforms and compresses them into other representation. The 24kHz model is capable of compressing and decompressing bird audio samples without retraining or any fine tunning see the [DAC test notebook]() to get an idea.
-Using the [events_to_latent](dll24/final/utils/events_to_latent.py) script we can take the extracted events hdf5 file from above and create another hdf5 file which now only contains compressed event latents with the corresponding unique ID. Again we can make some specifications:
+Using the [events_to_latent](events_to_latent.py) script we can take the extracted events hdf5 file from above and create another hdf5 file which now only contains compressed event latents with the corresponding unique ID. Again we can make some specifications:
 - `--hdf_path` : path to the hdf5 file that contains events (default: "./extracted_events.hdf5")
 - `--scaling` : scaling method (default: "normalize")
     - also available : "standardize", "none"
