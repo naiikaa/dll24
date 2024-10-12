@@ -70,8 +70,7 @@ dac_model = dac.DAC.load(dac_model_path)
 
 def generate_latents(dataset, model):
     latents_list = []
-    clen = len(dataset)
-    clen = 150
+    clen = min(len(dataset), 150)
     for i in range(clen):
         print(i)
         signal = AudioSignal(dataset.retransform(dataset[i]), sample_rate=24000)
