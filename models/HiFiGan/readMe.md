@@ -1,3 +1,7 @@
+#### solid foundation of the code:
+- `https://github.com/jik876/hifi-gan`
+- `https://github.com/chrisdonahue/wavegan`
+
 # HiFi-GAN Audio Preprocessing and Generation
 
 This script preprocesses bird call audio data from the **BirdSet** dataset, trains a **HiFi-GAN** generator model, and generates synthetic audio. The workflow covers everything from loading and preprocessing audio files to training a GAN model and generating audio.
