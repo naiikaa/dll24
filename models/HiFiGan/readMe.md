@@ -25,6 +25,7 @@ This script preprocesses bird call audio data from the **BirdSet** dataset, trai
 5. **Audio Generation**:
    - Once trained, the model generates synthetic audio from random input, which is saved as a `.wav` file.
 
+
 ## Installation
 
 To install the required dependencies, run:
