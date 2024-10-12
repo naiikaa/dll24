@@ -23,12 +23,12 @@ def print_module_structure(start_path, indent=''):
             print(f"{indent}{item}")
 
 
-relative_path = os.path.abspath('./')
+relative_path = os.path.abspath('../')
 os.environ['PROJECT_ROOT'] = relative_path
 os.environ['HYDRA_FULL_ERROR'] = '1'
 # Relative path
-relative_path = './configs_birdset'
-relative_path_local = './config'
+relative_path = 'configs_birdset'
+relative_path_local = 'config'
 root = os.path.abspath(relative_path)
 local = os.path.abspath(relative_path_local)
 print(root)

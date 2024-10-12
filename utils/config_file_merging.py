@@ -12,12 +12,12 @@ files = [
 ]
 
 base_cfg = OmegaConf.load(
-    "../notebooks/reproduce_training_ekaterina/configs_birdset/experiment/birdset_neurips24/HSN/DT/efficientnet.yaml")
+    "../notebooks/birdset_training/birdset_train_pipeline/configs_birdset/experiment/birdset_neurips24/HSN/DT/efficientnet.yaml")
 for file in files:
     new_cfg = OmegaConf.load(file)
     base_cfg = OmegaConf.merge(base_cfg, new_cfg)
     print(f"Loaded {file}:")
 
 print(OmegaConf.to_yaml(base_cfg))
-output_file = '../notebooks/reproduce_training_ekaterina/configs_local/merged_config.yaml'
+output_file = '../notebooks/birdset_training/birdset_train_pipeline/configs_local/merged_config.yaml'
 OmegaConf.save(base_cfg, output_file)

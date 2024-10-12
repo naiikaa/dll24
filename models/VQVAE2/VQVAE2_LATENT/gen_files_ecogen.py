@@ -1,6 +1,6 @@
 import os
 
-from notebooks.reproduce_training_ekaterina import BirdSetDataModule, DatasetConfig
+from notebooks.birdset_training import BirdSetDataModule, DatasetConfig
 from datasets import load_dataset
 import lightning as lt
 from torch.utils.data import DataLoader, Dataset
@@ -102,7 +102,7 @@ def main() -> None:
 
     dm = BirdSetDataModule(
         dataset=DatasetConfig(
-            data_dir='../../../notebooks/reproduce_training_ekaterina/gen_model_test/data_birdset/HSN',
+            data_dir='../../../notebooks/birdset_training/gen_model_test/data_birdset/HSN',
             dataset_name='HSN',
             hf_path='DBD-research-group/BirdSet',
             hf_name='HSN',
@@ -125,7 +125,7 @@ def main() -> None:
     trainer = lt.Trainer(max_epochs=30)
     trainer.fit(lt_model, dataloader)
     torch.save(lt_model.state_dict(),
-               '../../../notebooks/reproduce_training_ekaterina/gen_model_test/checkpoints/epoch=20.ckpt')
+               '../../../notebooks/birdset_training/gen_model_test/checkpoints/epoch=20.ckpt')
 
 
 if __name__ == "__main__":
