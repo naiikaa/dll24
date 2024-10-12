@@ -13,7 +13,7 @@ class WaveNetModel(nn.Module):
 
     Args:
         layers (Int):               Number of layers in each block
-        blocks (Int):               Number of wavenet blocks of this model
+        blocks (Int):               Number of WAVENET blocks of this model
         dilation_channels (Int):    Number of channels for the dilated convolution
         residual_channels (Int):    Number of channels for the residual connection
         skip_channels (Int):        Number of channels for the skip connections

@@ -88,7 +88,7 @@ class WavenetTrainer:
                         continue
                     time_string = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
                     # torch.save(self.model, self.snapshot_path + '/' + self.snapshot_name + '_' + time_string)
-                    torch.save(self.model.state_dict(), self.snapshot_name + 'wavenet_model.pth')
+                    torch.save(self.model.state_dict(), self.snapshot_name + 'wavenet_v1.pth')
                 self.logger.log(step, loss)
 
     def validate(self):

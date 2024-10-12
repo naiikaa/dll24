@@ -8,7 +8,7 @@ from torch.autograd import Variable
 import torch.optim as optim
 from tqdm.auto import tqdm
 
-# modified version of wavenet model from:
+# modified version of WAVENET model from:
 # https://github.com/prantoshdas/Pytorch_Wavenet/blob/main/Wavent_notebook/Final_wavenet2.ipynb
 
 torch.cuda.empty_cache()
@@ -58,7 +58,7 @@ class Wavenet(nn.Module):
 
         ##creating first channels##
         self.input_convs = nn.Conv1d(in_channels=self.n_category, out_channels=self.n_residual_channels, kernel_size=1)
-        ###Creating wavenet blocks stacks###
+        ###Creating WAVENET blocks stacks###
         for d in self.dilations:
             self.filter_convs.append(
                 nn.Conv1d(in_channels=n_residual_channels, out_channels=n_dil_channnels, kernel_size=kernel_size,

@@ -4,7 +4,7 @@ from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
 
-# modified wavenet file implementation from: https://github.com/Vichoko/pytorch-wavenet/tree/master
+# modified WAVENET file implementation from: https://github.com/Vichoko/pytorch-wavenet/tree/master
 
 dtype = torch.FloatTensor  # data type
 ltype = torch.LongTensor  # label type
@@ -32,7 +32,7 @@ print('parameter count: ', model.parameter_count())
 data = WavenetDataset(dataset_file='example.npz',
                       item_length=model.receptive_field + model.output_length - 1,
                       target_length=model.output_length,
-                      file_location='../../unpacked_data',
+                      file_location='../../../notebooks/reproduce_training_ekaterina/gen_model_test/unpacked_data',
                       test_stride=500)
 print('the dataset has ' + str(len(data)) + ' items')
 
