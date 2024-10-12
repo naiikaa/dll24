@@ -25,3 +25,8 @@ To install the necessary dependencies, run:
 
 ```bash
 pip install -r requirements.txt
+
+
+simple command which used to run it before
+```bash
+python preprocess_bird_calls.py --dataset_name DBD-research-group/BirdSet --subset_name HSN --output_dir bird_snippets --desired_length 5.0
