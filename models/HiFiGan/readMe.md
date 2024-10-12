@@ -1,4 +1,4 @@
-#### solid foundation of the code:
+#### used as foundation:
 - `https://github.com/jik876/hifi-gan`
 - `https://github.com/chrisdonahue/wavegan`
 
