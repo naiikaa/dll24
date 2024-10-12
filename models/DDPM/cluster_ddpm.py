@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/npopkov/dll24')
+#sys.path.append('/home/npopkov/dll24')
 import os
 import h5py
 import numpy as np
@@ -11,6 +11,9 @@ torch.set_float32_matmul_precision('medium')
 from denoising_diffusion_pytorch import Unet, GaussianDiffusion
 
 import lightning as lt
+
+import tables
+tables.file._open_files.close_all()
 
 class LatentDataset(Dataset):
     def __init__(self, h5_file):
@@ -55,7 +58,7 @@ class LatentDataset(Dataset):
         return data.reshape(self.shape)
     
 
-hdf = h5py.File('256encodesamp.hdf5', 'r')
+hdf = h5py.File('256encodesamp.hdf5', 'r',)
 dataset = LatentDataset(hdf)
 hdf.close()
 
@@ -64,10 +67,10 @@ hdf.close()
 
 
 model = Unet(
-    dim = 32,
+    dim = 64,
     channels = 1,
-    dim_mults = (1, 2, 4,8),
-    flash_attn = False,
+    dim_mults = (1, 2, 4),
+    flash_attn = True,
 )
 
 diffusion = GaussianDiffusion(
