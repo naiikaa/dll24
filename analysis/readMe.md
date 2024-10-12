@@ -11,7 +11,7 @@ This directory contains documents that provides:
 
 * Also explores features critical for generative models in bird sound evaluation, such as:
 
-## [Key Features for BirdSet Evaluation](analysis/which features where used in the BirdSet evaluation.pdf)
+## Key Features for BirdSet Evaluation
 
 - **Audio Recordings**: The primary data source for learning the characteristics of bird sounds.
 - **Frequency Range (Low Frequency and High Frequency)**: Defines the range of frequencies for synthesized bird sounds.
