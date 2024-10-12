@@ -1,0 +1,6 @@
+librosa
+numpy
+torch
+tqdm
+soundfile
+datasets
