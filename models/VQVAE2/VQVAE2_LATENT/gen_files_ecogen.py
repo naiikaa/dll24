@@ -1,9 +1,5 @@
 import os
 
-from pytorch_lightning.callbacks import ModelCheckpoint
-from torch import nn
-from torchvision.utils import save_image
-from IPython.display import Audio
 from notebooks.reproduce_training_ekaterina import BirdSetDataModule, DatasetConfig
 from datasets import load_dataset
 import lightning as lt
@@ -21,7 +17,7 @@ import argparse
 try:
     from networks.vqvae2 import VQVAE
 except ImportError:
-    from vqvae2 import VQVAE
+    from models.VQVAE2.ECOGEN_V.vqvae2 import VQVAE
 
 parser = argparse.ArgumentParser(description="Train VQVAE on BirdSet dataset.")
 parser.add_argument('--data_paths', type=str, default='./data_birdset/HSN/*', help='Paths to data samples.')
@@ -106,7 +102,7 @@ def main() -> None:
 
     dm = BirdSetDataModule(
         dataset=DatasetConfig(
-            data_dir='../data_birdset/HSN',
+            data_dir='../../../notebooks/reproduce_training_ekaterina/gen_model_test/data_birdset/HSN',
             dataset_name='HSN',
             hf_path='DBD-research-group/BirdSet',
             hf_name='HSN',
@@ -128,7 +124,8 @@ def main() -> None:
     # Train model with audio waveforms
     trainer = lt.Trainer(max_epochs=30)
     trainer.fit(lt_model, dataloader)
-    torch.save(lt_model.state_dict(), '../checkpoints/epoch=20.ckpt')
+    torch.save(lt_model.state_dict(),
+               '../../../notebooks/reproduce_training_ekaterina/gen_model_test/checkpoints/epoch=20.ckpt')
 
 
 if __name__ == "__main__":

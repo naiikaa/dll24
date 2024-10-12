@@ -97,4 +97,4 @@ class LatentDataset(Dataset):
 
 
 latent_dataset = LatentDataset(latents_tensor)
-torch.save(latent_dataset.latents_tensor, 'latent_dataset.pt')
+torch.save(latent_dataset.latents_tensor, '../models/VQVAE2/latent_dataset.pt')

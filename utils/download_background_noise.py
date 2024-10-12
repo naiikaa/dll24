@@ -13,7 +13,7 @@ def main():
     subfolder = "dcase18"
     revision = "data"
 
-    local_dir = "./noise_data"
+    local_dir = "../notebooks/reproduce_training_ekaterina/noise_data"
     # Create the local directory if it doesn't exist
     os.makedirs(local_dir, exist_ok=True)
     # Download the files
