@@ -8,6 +8,6 @@ This part contains all model architectures that were used for our generative exp
 ### DDPM
 - [DDPM](DDPM/cluster_ddpm.py) for generating 2D latents
 ### WaveNet
-- 
+- [WaveNet] for generating ...
 ### VQVAE2
-- 
+- [VQVAE2] for generating ...
