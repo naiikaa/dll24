@@ -19,7 +19,7 @@ You will find many different model architectures and experiments which investiga
 
 ## Content
 ### [analysis](analysis/readMe.md)
-contains in-depth research and comparative studies focused on generative models used for audio synthesis, particularly bird sound generation.
+Contains in-depth research and comparative studies focused on generative models used for audio synthesis, particularly bird sound generation.
 ### [models](models/README.md)
 Model implementations, scripts for training/inference and experiments with different model architectures.
 ### [notebooks](notebooks/README.md)
