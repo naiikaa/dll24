@@ -7,7 +7,7 @@ This part contains all model architectures that were used for our generative exp
 - [WGAN-GP](GAN/WGAN-GP/WGAN-GP.py) for generating 2D latents
 - [hifiGan_quick_check_V0.1.py](GAN/HiFiGan/HiFiGan_quick_check_V.01.py) first check for generating `.wav` files
 ### DDPM
-- [DDPM](DDPM/cluster_ddpm.py) for generating 2D latents
+- [DDPM](DDPM/README.md) for generating 2D latents
 ### WAVENET
 - [WAVENET_V1](WAVENET/wavenet_v1/WAVENET_TRAIN.ipynb) for generating `.wav` files 
 - [WAVENET_V2](WAVENET/wavenet_v2/WAVENET_TRAIN.ipynb) for generating `.wav` files
