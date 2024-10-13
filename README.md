@@ -18,8 +18,8 @@ This project repo is about the question whether it is possible to synthesize avi
 You will find many different model architectures and experiments which investigate one of those presented tasks.
 
 ## Content
-### [analysis](analysis/readme)
-???
+### [analysis](analysis/readMe.md)
+contains in-depth research and comparative studies focused on generative models used for audio synthesis, particularly bird sound generation.
 ### [models](models/README.md)
 Model implementations, scripts for training/inference and experiments with different model architectures.
 ### [notebooks](notebooks/README.md)
