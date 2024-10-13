@@ -12,8 +12,7 @@ This project repo is about the question whether it is possible to synthesize avi
 - compression of raw waveforms into different representations (latent samples)
 - latent representation synthesis via models which are capable of processing image-like data (2D approach)
 
-![image](https://github.com/user-attachments/assets/6ce57ac7-b70f-4d1f-bb48-0ac2d5ad986f)
-
+![image](https://github.com/user-attachments/assets/c11ce631-4ec3-40b9-8ecc-8fe418c158ce)
 
 You will find many different model architectures and experiments which investigate one of those presented tasks.
 
