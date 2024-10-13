@@ -5,6 +5,7 @@ This part contains all model architectures that were used for our generative exp
 - [DCGAN](GAN/DCGAN/DCGAN.py) for generating 2D latents
 - [WGAN](GAN/WGAN/WGAN.py) for generating 2D latents
 - [WGAN-GP](GAN/WGAN-GP/WGAN-GP.py) for generating 2D latents
+- [hifiGan_quick_check_V0.1.py](GAN/HiFiGan/HiFiGan_quick_check_V.01.py) first check for generating `.wav` files
 ### DDPM
 - [DDPM](DDPM/cluster_ddpm.py) for generating 2D latents
 ### WAVENET
@@ -18,5 +19,3 @@ This part contains all model architectures that were used for our generative exp
 ### WAVEGLOW
 - [WAVEGLOW](WAVEGLOW/WAVEGLOW.ipynb) for generating 2D spectrograms
 
-### HiFiGan
-- [hifiGan_quick_check_V.01.py](HiFiGan/hifiGan_quick_check_V.01.py) for generating `.wav` files
