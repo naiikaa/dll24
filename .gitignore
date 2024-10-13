@@ -17,7 +17,7 @@ lightning_logs
 .idea
 notebooks/birdset_training/noise_data/*
 data_birdset
-/notebooks/birdset_training/logs
+*/logs
 /notebooks/birdset_training/birdset_train_pipeline/birdset_modules
 /notebooks/birdset_training/birdset_train_pipeline/configs_birdset
 *.hdf5
@@ -25,4 +25,4 @@ notebooks/birdset_training/gen_model_test/checkpoints/epoch=5-step=30005.ckpt
 *.npy
 *.ckpt
 *.dac
-notebooks/birdset_training/gen_model_test/wavenet_model.pth
+*/unpacked_data/
